@@ -20,6 +20,13 @@ type Config struct {
 
 	// seedConfig holds the seed (global) configurations
 	seedConfig map[string]*SeedConfig
+
+	// Paths specified in dbt_project.yml
+	SourcePaths []string
+	TestPaths   []string
+	MacroPaths  []string
+	DocsPaths   []string
+	DataPaths   []string
 }
 
 func (c *Config) GetTargetFor(path string) *Target {
@@ -93,6 +100,12 @@ func Read(targetProfile string, upstreamProfile string, threads int, strExecutor
 			ProjectSubstitutions: make(map[string]map[string]string),
 			ExecutionProjects:    make([]string, 0),
 		},
+
+		SourcePaths: project.SourcePaths,
+		TestPaths:   project.TestPaths,
+		MacroPaths:  project.MacroPaths,
+		DocsPaths:   project.DocsPaths,
+		DataPaths:   project.DataPaths,
 	}
 
 	if upstreamProfile != "" {
@@ -153,6 +166,16 @@ type dbtProject struct {
 	Profile string                            `yaml:"profile"`
 	Models  map[string]map[string]interface{} `yaml:"models"` // "Models[project_name][key]value"
 	Seeds   map[string]map[string]interface{} `yaml:"seeds"`  // "Seeds[project_name][key]value"
+
+	// Path configurations (non-exhaustive).
+	//
+	// https://docs.getdbt.com/reference/dbt_project.yml
+	//
+	SourcePaths []string `yaml:"source-paths"`
+	TestPaths   []string `yaml:"test-paths"`
+	MacroPaths  []string `yaml:"macro-paths"`
+	DocsPaths   []string `yaml:"docs-paths"`
+	DataPaths   []string `yaml:"data-paths"`
 }
 
 func readDBTProject() (dbtProject, error) {
