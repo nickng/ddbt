@@ -11,6 +11,7 @@ import (
 	"sync"
 
 	"ddbt/compilerInterface"
+	"ddbt/config"
 )
 
 type FileSystem struct {
@@ -38,20 +39,28 @@ func ReadFileSystem(msgWriter io.Writer) (*FileSystem, error) {
 	//	return nil, err
 	//}
 
-	if err := fs.scanDirectory("./macros/", MacroFile); err != nil {
-		return nil, err
+	for _, macros := range config.GlobalCfg.MacroPaths {
+		if err := fs.scanDirectory(macros, MacroFile); err != nil {
+			return nil, err
+		}
 	}
 
-	if err := fs.scanDirectory("./models/", ModelFile); err != nil {
-		return nil, err
+	for _, models := range config.GlobalCfg.SourcePaths {
+		if err := fs.scanDirectory(models, ModelFile); err != nil {
+			return nil, err
+		}
 	}
 
-	if err := fs.scanDirectory("./tests/", TestFile); err != nil {
-		return nil, err
+	for _, tests := range config.GlobalCfg.TestPaths {
+		if err := fs.scanDirectory(tests, TestFile); err != nil {
+			return nil, err
+		}
 	}
 
-	if err := fs.scanSeedDirectory("./data/"); err != nil {
-		return nil, err
+	for _, data := range config.GlobalCfg.DataPaths {
+		if err := fs.scanSeedDirectory(data); err != nil {
+			return nil, err
+		}
 	}
 
 	fmt.Fprintf(
